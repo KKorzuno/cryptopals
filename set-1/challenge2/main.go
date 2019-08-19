@@ -1,4 +1,4 @@
-package main
+package challenge2
 
 import (
 	"encoding/base64"
@@ -14,7 +14,7 @@ func Hex_string_to_base64(msg string) (output string, err error) {
 	return
 }
 
-func Fixed_XOR_on_strings(hex_string, hex_string2 string) (output_hex_string string, err error) {
+func Fixed_XOR_on_hex_strings(hex_string, hex_string2 string) (output_hex_string string, err error) {
 	decoded_hex_string, err := hex.DecodeString(hex_string)
 	decoded_hex_string2, err := hex.DecodeString(hex_string2)
 
@@ -40,7 +40,7 @@ func Fixed_XOR_on_strings(hex_string, hex_string2 string) (output_hex_string str
 }
 
 func main(){
-	xor_output,myerr := Fixed_XOR_on_strings("1c0111001f010100061a024b53535009181c", "686974207468652062756c6c277320657965")
+	xor_output,myerr := Fixed_XOR_on_hex_strings("1c0111001f010100061a024b53535009181c", "686974207468652062756c6c277320657965")
 	if myerr != nil {
 		fmt.Println("error")
 		return
