@@ -2,45 +2,40 @@ package main
 
 import (
 	"../challenge2"
-	"fmt"
 	"encoding/hex"
+	"fmt"
 )
 
 func main() {
 
-	for i := '0'; i <= '9'; i++ {
-		str, err  := XORStringAgainstSingleCharacter("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736",string(i))
-		for i=0; i< len(str);i++ {
-			fmt.Print("%s", hex.DecodeString(str[i]))
+	input := "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
+	fmt.Println(len(input))
+	texts := make([]string, 'z'-'a'+1)
+	
+	/*
+	fmt.Println('z' - 'a' + 1)
+	fmt.Println('a')
+	for letter := 0; letter < 'z'-'a'+1; letter++ {
+
+		for i := 0; i < len(input); i++ {
+			fmt.Printf("\nletter: %v, i:%v\n", letter, i)
+			texts[letter] += string(letter + 'a')
+
 		}
-		if err != nil {}
+		fmt.Println(hex.EncodeToString([]byte(texts[letter])))
+		fmt.Println("ABC")
+		fmt.Printf("lenght of input: %v length of hex_text: %v", len(input), len(hex.EncodeToString([]byte(texts[letter]))))
+		msg, err := challenge2.Fixed_XOR_on_hex_strings(input, hex.EncodeToString([]byte(texts[letter])))
+		if err != nil {
+			fmt.Println("PROBLEMS with XOR")
+			return
+		}
+		str2, err2 := hex.DecodeString(msg)
+		if err2 != nil {
+			fmt.Println("PROBLEMS with decoding the outcome hex")
+			return
+		}
+		fmt.Println(string(str2))
 	}
-	for i := 'a'; i <= 'f'; i++ {
-		fmt.Println(XORStringAgainstSingleCharacter("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736",string(i)))
-	}
-
-
-}
-
-func XORStringAgainstSingleCharacter(str string, char string) (output string, err error) {
-	// hexedLetter := hex.EncodeToString([]byte(char))
-
-	var longListOfLetters string
-	for i :=0 ;i < len(str); i++ {
-		longListOfLetters+=(char)
-	}
-
-	// var longListOfHexLetters string
-	// for i :=0 ;i < len(str); i++ {
-	// 	longListOfHexLetters+=hexedLetter
-	// }
-
-	// longListOfLettersHex := hex.EncodeToString([]byte(longListOfLetters))
-	fmt.Println(char)
-	// fmt.Println(hexedLetter)
-	// fmt.Println(longListOfHexLetters)
-	// fmt.Println(longListOfLettersHex)
-	fmt.Println(len(str))
-	// fmt.Println(len(longListOfLettersHex))
-	return 	challenge2.Fixed_XOR_on_hex_strings(str,longListOfLetters)
+	*/
 }
