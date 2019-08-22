@@ -2,19 +2,20 @@ package main
 
 import (
 	"errors"
-	// "../challenge2"
+	"../challenge2"
+	"../challenge5"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
-	// "strings"
+	"strings"
 	"math/bits"
 )
 
 func main() {
-	fmt.Println(CumputeDistance("this is a test", "wokka wokka!!!"))
+	// fmt.Println(CumputeDistance("this is a test", "wokka wokka!!!"))
 
 	file, err := os.Open("6.txt")
 	if err != nil {
@@ -25,13 +26,45 @@ func main() {
 	bytesFromFile, err := ioutil.ReadAll(file)
 	decodedBytesFromFile, err := base64.StdEncoding.DecodeString(string(bytesFromFile))
 
-	fmt.Println(getNormalizedDistanceofKeysize(decodedBytesFromFile, 20))
+	distances := make([]float64, 40-2)
+	for i:=3; i<=40;i++ {
+		distances[i-3] = getNormalizedDistanceofKeysize(decodedBytesFromFile, i, 5)
+	}
+	
+	//somehow guess the keysize
+	keysize := 29
+
+	
+	// fmt.Println(len(decodedBytesFromFile))
+	// for i,e := range distances {
+	// 	fmt.Println( e, i+3)
+	// }
+
+	// for i:= 0; i< keysize: i++{
+
+	// }
+		// allTheLetters := make([]int, keysize)
+		var allTheLetters string
+	for i:=0;i<keysize;i++ {
+		column := extractColumn(transposeBytes(decodedBytesFromFile,keysize),i)
+		letterInt, _ := getMostProbableKeyLetter(hex.EncodeToString(column))
+		allTheLetters = allTheLetters + string(byte(letterInt))
+	}
+
+	fmt.Println(allTheLetters)
+
+
+	result, _ := challenge5.ApplyRepeatingKeyXOR(string(decodedBytesFromFile),allTheLetters)
+
+	bytes, _ := hex.DecodeString(result)
+	fmt.Println(string(bytes))
+
 }
 
-func getNormalizedDistanceofKeysize(decodedBytesFromFile []byte, keysize int) float64 {
+func getNormalizedDistanceofKeysize(decodedBytesFromFile []byte, keysize int, nSlices int) float64 {
 
-	slices := make([][]uint8, 4)       // initialize a slice of dy slices
-	for i:=0;i<4;i++ {
+	slices := make([][]uint8, nSlices)       // initialize a slice of dy slices
+	for i:=0;i<nSlices;i++ {
 		slices[i] = decodedBytesFromFile[i*keysize : keysize*(i+1)]
 	}
 
@@ -84,4 +117,77 @@ func sumOfDistances2(slices [][]byte) (distance int){
 		}
 	}
 	return distance
+}
+
+func transposeBytes(decodedBytesFromFile []byte, keysize int)( [][]byte ) {
+	totalBytes := len(decodedBytesFromFile)
+	transposedBytes := make([][]byte, totalBytes/keysize+1)
+	
+	for i:=0; i<totalBytes/keysize +1; i++ {
+		transposedBytes[i] = decodedBytesFromFile[keysize * i:keysize * (i+1)]
+	}
+	return transposedBytes
+}
+
+func extractColumn(slice2d [][]byte, columnIndex int) (column []byte) {
+    column = make([]byte, 0)
+    for _, row := range slice2d {
+		if(len(row) <= columnIndex) {
+			break
+		}
+		column = append(column, row[columnIndex])
+    }
+    return
+}
+
+func getMostProbableKeyLetter(input string) (int,  string){
+	
+	repeatedLetters := make([]string, 255)
+	decodedStrings := make([]string, 255)
+
+	for letter := 0; letter < 255; letter++ {
+		for i := 0; i < len(input)/len(hex.EncodeToString([]byte(string(letter)))); i++ {
+			repeatedLetters[letter] += hex.EncodeToString([]byte(string(letter)))
+		}
+		// fmt.Println("HERE")
+		// fmt.Println(len(repeatedLetters[letter]))
+		// fmt.Println(len(input)) 
+		// fmt.Println("HERE")
+
+		msg, err := challenge2.Fixed_XOR_on_hex_strings(input, repeatedLetters[letter])
+		if err != nil {
+			// fmt.Println(input, repeatedLetters[letter])
+			fmt.Println("PROBLEMS with XOR " + err.Error())
+			return 0,""
+		}
+		str2, err2 := hex.DecodeString(msg)
+		if err2 != nil {
+			fmt.Println("PROBLEMS with decoding the outcome hex")
+			// return 0,"" 
+		}
+		decodedStrings[letter] = string(str2)
+	}
+
+	return findMostEnglishString(decodedStrings)
+}
+
+func findMostEnglishString(decodedString []string) (letter int, bestString string) {
+	var maxCount int
+	for i , element := range decodedString {
+		currentCount := englishCount(element)
+		if currentCount > maxCount {
+			letter = i
+			bestString = element
+			maxCount = currentCount
+		}
+	}
+	return
+}
+
+func englishCount(input string) (count int) {
+	input = strings.ToLower(input)
+	for _ , element := range "etaoin shrdlu" {
+		count += strings.Count(input, string(element))
+	}
+	return
 }

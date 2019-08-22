@@ -16,10 +16,18 @@ func Hex_string_to_base64(msg string) (output string, err error) {
 
 func Fixed_XOR_on_hex_strings(hex_string, hex_string2 string) (output_hex_string string, err error) {
 	decoded_hex_string, err := hex.DecodeString(hex_string)
+	if err != nil{
+		fmt.Println(err)
+	}
 	decoded_hex_string2, err := hex.DecodeString(hex_string2)
 
 	//fmt.Printf("type: %T", decoded_hex_string)
 	//base64_str, myerr := Hex_string_to_base64(mymsg)
+	if err != nil{
+		fmt.Println(err)
+	}
+	// fmt.Println(len(decoded_hex_string) , len(decoded_hex_string2))
+
 	if len(decoded_hex_string) != len(decoded_hex_string2) {
 		err = errors.New("Hex strings are not of equal lenght")		
 		return

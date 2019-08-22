@@ -1,4 +1,4 @@
-package main
+package challenge5
 
 import (
 	"../challenge2"
