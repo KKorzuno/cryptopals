@@ -26,18 +26,20 @@ func main() {
     }
     defer file.Close()
 
-    scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(file)
+	// bestLines := make([]string, 500)
+	var bestLines []string
     for scanner.Scan() {
 		input := scanner.Text()
 		
-		bestLine := maisn(input)
-		// fmt.Println(bestLine)
-		bestLine = bestLine + "hi"
+		bestLines = append(bestLines, maisn(input))
     } 
 
     if err := scanner.Err(); err != nil {
         log.Fatal(err)
-    }
+	}
+	
+	fmt.Println(findMostEnglishString(bestLines))
 }
 func maisn(input string) (bestString string){
 	
@@ -58,6 +60,7 @@ func maisn(input string) (bestString string){
 		
 		msg, err := challenge2.Fixed_XOR_on_hex_strings(input, texts[letter])
 		if err != nil {
+			fmt.Println(input, texts[letter])
 			fmt.Println("PROBLEMS with XOR " + err.Error())
 			return
 		}
