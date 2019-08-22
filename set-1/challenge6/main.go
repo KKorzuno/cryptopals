@@ -25,7 +25,7 @@ func main() {
 	bytesFromFile, err := ioutil.ReadAll(file)
 	decodedBytesFromFile, err := base64.StdEncoding.DecodeString(string(bytesFromFile))
 
-	fmt.Println(getNormalizedDistanceofKeysize(decodedBytesFromFile, 2))
+	fmt.Println(getNormalizedDistanceofKeysize(decodedBytesFromFile, 20))
 }
 
 func getNormalizedDistanceofKeysize(decodedBytesFromFile []byte, keysize int) float64 {
@@ -35,8 +35,10 @@ func getNormalizedDistanceofKeysize(decodedBytesFromFile []byte, keysize int) fl
 		slices[i] = decodedBytesFromFile[i*keysize : keysize*(i+1)]
 	}
 
-	distanceSum := sumOfDistances(slices, 0)
-	return float64(distanceSum) / float64(keysize) / 12
+
+	distance := sumOfDistances(slices,0)
+
+	return float64(distance) / float64(keysize) / 12
 }
 
 func ComputeHammingDistance(str1 string, str2 string) (result int) {
@@ -72,4 +74,14 @@ func sumOfDistances(slice [][]byte, currentSum int) (sum int) {
 		}
 	
 	return sumOfDistances(sliceTail, currentSum)
+}
+
+func sumOfDistances2(slices [][]byte) (distance int){
+	for i,slice1 := range slices {
+		for j,slice2 := range slices {
+			if (i>=j) {continue}
+			distance += ComputeHammingDistance(hex.EncodeToString(slice1), hex.EncodeToString(slice2))
+		}
+	}
+	return distance
 }
