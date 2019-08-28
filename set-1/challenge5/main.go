@@ -1,7 +1,7 @@
 package challenge5
 
 import (
-	"../challenge2"
+	"cryptopals/set-1/challenge2"
 	"encoding/hex"
 	"fmt"
 	"strings"

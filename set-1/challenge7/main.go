@@ -25,11 +25,14 @@ func main() {
 	fmt.Println(len(BytesFromFile))
 	fmt.Println(len(BytesFromFile) / keysize)
 	fmt.Println("****************************************************")
+
 	mycipher, _ := aes.NewCipher([]byte(key))
+
 	BytesFromFileIn2D := make([][]byte, len(BytesFromFile)/keysize)
 	decodedBytesIn2D := make([][]byte, len(BytesFromFile)/keysize)
 	fmt.Println(string(BytesFromFile))
 	fmt.Println("***************************************************")
+
 	for i := 0; i < len(BytesFromFileIn2D); i++ {
 		BytesFromFileIn2D[i] = BytesFromFile[keysize*i : keysize*(i+1)]
 		decodedBytesIn2D[i] = make([]byte, len(key))
