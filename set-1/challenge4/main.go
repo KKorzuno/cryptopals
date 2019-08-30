@@ -32,7 +32,7 @@ func main() {
     for scanner.Scan() {
 		input := scanner.Text()
 		
-		bestLines = append(bestLines, maisn(input))
+		bestLines = append(bestLines, createTableOfAllRepeatingKeyXORsWithInput(input))
     } 
 
     if err := scanner.Err(); err != nil {
@@ -41,7 +41,7 @@ func main() {
 	
 	fmt.Println(findMostEnglishString(bestLines))
 }
-func maisn(input string) (bestString string){
+func createTableOfAllRepeatingKeyXORsWithInput(input string) (bestString string){
 	
 	texts := make([]string, 255)
 	decodedString := make([]string, 255)

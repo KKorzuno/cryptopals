@@ -1,4 +1,4 @@
-package main
+package challenge10
 
 import (
 	"crypto/aes"
@@ -28,12 +28,12 @@ func main () {
 	bytesFromFileInBase64, err := ioutil.ReadAll(file)
 	bytesFromFile, err := base64.StdEncoding.DecodeString(string(bytesFromFileInBase64))
 
-	dec := decryptCBC("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", key, bytesFromFile)
+	dec := DecryptCBC("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", key, bytesFromFile)
 	fmt.Println(string(dec))
 }
-//"YELLOW SUBMARINE"
 
-func encryptEBC(key string, bytesToEncrypt []byte) []byte{
+
+func EncryptEBC(key string, bytesToEncrypt []byte) []byte{
 	keysize := len(key)
 	mycipher, _ := aes.NewCipher([]byte(key))
 	
@@ -54,7 +54,7 @@ func encryptEBC(key string, bytesToEncrypt []byte) []byte{
 	return encryptedBytesFlat
 }
 
-func decryptEBC(key string, bytesToDecrypt []byte) []byte{
+func DecryptEBC(key string, bytesToDecrypt []byte) []byte{
 	keysize := len(key)
 	mycipher, _ := aes.NewCipher([]byte(key))
 	
@@ -75,7 +75,7 @@ func decryptEBC(key string, bytesToDecrypt []byte) []byte{
 	return decryptedBytesFlat
 }
 
-func encryptCBC(iv string, key string, bytesToEncrypt []byte) []byte{
+func EncryptCBC(iv string, key string, bytesToEncrypt []byte) []byte{
 	keysize := len(key)
 	paddedBytesToEncrypt := AddPadding(bytesToEncrypt, keysize)
 	mycipher, _ := aes.NewCipher([]byte(key))
@@ -121,7 +121,7 @@ func AddPadding(  bytes []byte, keysize int) []byte{
 
 }
 
-func decryptCBC(iv string, key string, bytesToDecrypt []byte) []byte{
+func DecryptCBC(iv string, key string, bytesToDecrypt []byte) []byte{
 	keysize := len(key)
 	mycipher, _ := aes.NewCipher([]byte(key))
 	supportVector := []byte (iv)

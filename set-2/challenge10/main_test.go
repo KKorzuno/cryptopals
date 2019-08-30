@@ -1,4 +1,4 @@
-package main
+package challenge10
 
 
 import "testing"
@@ -54,8 +54,8 @@ func TestEncodeDecode( t *testing.T) {
 	key:= "0000000000000000"
 	bytes := []byte ("yellow submarineyellow submarine")
 
-	encrypted := encryptCBC(iv,key,bytes)
-	decrypted := decryptCBC(iv, key, encrypted)
+	encrypted := EncryptCBC(iv,key,bytes)
+	decrypted := DecryptCBC(iv, key, encrypted)
 
 	for i:=0;i<len(bytes);i++ {
 		if bytes[i] != decrypted[i] {

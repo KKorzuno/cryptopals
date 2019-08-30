@@ -1,8 +1,8 @@
-package main
+package challenge8
 
 import (
 
-	"../challenge2"
+	"cryptopals/set-1/challenge2"
 
 	"encoding/base64"
 	"encoding/hex"
@@ -32,12 +32,25 @@ func main() {
 		input := scanner.Text()
 		tempBytes, _ := base64.StdEncoding.DecodeString(input)
 		//distances = append(distances, getNormalizedDistanceofKeysize(tempBytes, keysize, 5))
-		fmt.Println(getNormalizedDistanceofKeysize(tempBytes, keysize, 15), float64(iteration))
+		fmt.Println(getMinDistanceInKeysizeMultiComparison(tempBytes, keysize, 15), float64(iteration))
 		iteration++
 	}
 }
 
-func getNormalizedDistanceofKeysize(decodedBytesFromFile []byte, keysize int, nSlices int) float64 {
+func GetNormalizedDistanceofKeysize(decodedBytesFromFile []byte, keysize int, nSlices int) float64 {
+
+	slices := make([][]uint8, nSlices)       // initialize a slice of dy slices
+	for i:=0;i<nSlices;i++ {
+		slices[i] = decodedBytesFromFile[i*keysize : keysize*(i+1)]
+	}
+
+
+	distance := sumOfDistances(slices,16)
+
+	return float64(distance) / float64(keysize) / 12
+}
+
+func getMinDistanceInKeysizeMultiComparison(decodedBytesFromFile []byte, keysize int, nSlices int) float64 {
 
 	slices := make([][]uint8, nSlices)       // initialize a slice of dy slices
 	for i:=0;i<nSlices;i++ {
