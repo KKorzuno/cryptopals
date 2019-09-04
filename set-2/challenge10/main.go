@@ -52,6 +52,7 @@ func EncryptEBC(key string, bytesToEncrypt []byte) []byte{
 	keysize := len(key)
 	mycipher, _ := aes.NewCipher([]byte(key))
 	paddedBytesToEncrypt := AddPadding(bytesToEncrypt, keysize)
+	fmt.Println()
 	bytesToEncryptIn2D := make([][]byte, len(paddedBytesToEncrypt)/keysize)
 	encryptedBytesIn2D := make([][]byte, len(paddedBytesToEncrypt)/keysize)
 
