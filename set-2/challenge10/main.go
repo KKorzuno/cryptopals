@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"cryptopals/set-1/challenge2"
 	// "cryptopals/set-2/challenge9"
+	"strings"
 
 )
 
@@ -27,18 +28,32 @@ func main () {
 	// bytesFromFile, err := ioutil.ReadAll(file)
 	bytesFromFileInBase64, err := ioutil.ReadAll(file)
 	bytesFromFile, err := base64.StdEncoding.DecodeString(string(bytesFromFileInBase64))
-
+	fmt.Println("len(BytesFromFile): ", len(bytesFromFile))
 	dec := DecryptCBC("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", key, bytesFromFile)
-	fmt.Println(string(dec))
+	fmt.Println(string(dec))	
+	// CyphertextEBC:= EncryptEBC(key, dec)
+	// fmt.Println("len(CyphertextEBC):", len(CyphertextEBC))
+	// fmt.Println("len(dec): ", len(dec))
+
+
+
+	// CyphertextCBC:= EncryptCBC(key, "aaaaaaaaaaaaaaaa", dec)
+	// fmt.Println("len(CyphertextCBC):", len(CyphertextEBC))
+	// fmt.Println("len(dec): ", len(dec))
+
+
+
+
+
 }
 
 
 func EncryptEBC(key string, bytesToEncrypt []byte) []byte{
 	keysize := len(key)
 	mycipher, _ := aes.NewCipher([]byte(key))
-	
-	bytesToEncryptIn2D := make([][]byte, len(bytesToEncrypt)/keysize)
-	encryptedBytesIn2D := make([][]byte, len(bytesToEncrypt)/keysize)
+	paddedBytesToEncrypt := AddPadding(bytesToEncrypt, keysize)
+	bytesToEncryptIn2D := make([][]byte, len(paddedBytesToEncrypt)/keysize)
+	encryptedBytesIn2D := make([][]byte, len(paddedBytesToEncrypt)/keysize)
 
 	for i := 0; i < len(bytesToEncryptIn2D); i++ {
 		bytesToEncryptIn2D[i] = bytesToEncrypt[keysize*i : keysize*(i+1)]
@@ -67,17 +82,14 @@ func DecryptEBC(key string, bytesToDecrypt []byte) []byte{
 		mycipher.Decrypt(decryptedBytesIn2D[i], bytesToDecryptIn2D[i])
 	}
 
-	var decryptedBytesFlat []byte
-	for _,e := range decryptedBytesIn2D {
-		decryptedBytesFlat = append(decryptedBytesFlat, e...)
-	}
-
-	return decryptedBytesFlat
+	return FlattenPadded2DArray(decryptedBytesIn2D)
 }
 
 func EncryptCBC(iv string, key string, bytesToEncrypt []byte) []byte{
 	keysize := len(key)
+	//fmt.Println("len(bytesToEncrypt) before padding: ", len(bytesToEncrypt))
 	paddedBytesToEncrypt := AddPadding(bytesToEncrypt, keysize)
+	//fmt.Println("len(bytesToEncrypt) after padding: ", len(paddedBytesToEncrypt))
 	mycipher, _ := aes.NewCipher([]byte(key))
 	supportVector := []byte (iv)
 	bytesToEncryptIn2D := make([][]byte, len(paddedBytesToEncrypt)/keysize)
@@ -102,25 +114,6 @@ func EncryptCBC(iv string, key string, bytesToEncrypt []byte) []byte{
 	return encryptedBytesFlat
 }
 
-func XOROnBytes (by1 []byte , by2 []byte ) []byte {
-	str,err :=  challenge2.Fixed_XOR_on_hex_strings(hex.EncodeToString(by1),hex.EncodeToString(by2))
-		if (err != nil) {fmt.Println(err)}
-	res,err :=  hex.DecodeString(str)
-	if (err != nil) {fmt.Println(err)}
-	return res
-}
-
-func AddPadding(  bytes []byte, keysize int) []byte{
-	if len(bytes)%keysize == 0 {return bytes}
-	nPads := keysize - len(bytes)%keysize
-	for i := 0; i<nPads; i++ {
-		bytes = append(bytes ,[]byte("\x04")...)
-	}
-	
-	return bytes
-
-}
-
 func DecryptCBC(iv string, key string, bytesToDecrypt []byte) []byte{
 	keysize := len(key)
 	mycipher, _ := aes.NewCipher([]byte(key))
@@ -141,11 +134,40 @@ func DecryptCBC(iv string, key string, bytesToDecrypt []byte) []byte{
 		decryptedBytesIn2D[i] = XOROnBytes(decryptedBytesIn2D[i], supportVector)
 		supportVector=bytesToDecryptIn2D[i]
 	}
+	return FlattenPadded2DArray(decryptedBytesIn2D)
+}
 
-	var decryptedBytesFlat []byte
-	for _,e := range decryptedBytesIn2D {
-		decryptedBytesFlat = append(decryptedBytesFlat, e...)
+
+func XOROnBytes (by1 []byte , by2 []byte ) []byte {
+	str,err :=  challenge2.Fixed_XOR_on_hex_strings(hex.EncodeToString(by1),hex.EncodeToString(by2))
+		if (err != nil) {fmt.Println(err)}
+	res,err :=  hex.DecodeString(str)
+	if (err != nil) {fmt.Println(err)}
+	return res
+}
+
+func AddPadding(  bytes []byte, keysize int) []byte{
+	if len(bytes)%keysize == 0 {return bytes}
+	//fmt.Println("doing appending")
+	nPads := keysize - len(bytes)%keysize
+	for i := 0; i<nPads; i++ {
+		bytes = append(bytes ,[]byte("\x04")...)
+	}
+	//fmt.Println("len of byte inside padding function after padding: ", len(bytes))
+	return bytes
+
+}
+
+func FlattenPadded2DArray(bytesToFlatten [][]byte) (flatBytes []byte) {
+	paddingSize:= strings.Count(string(bytesToFlatten[len(bytesToFlatten)-1]),"\x04") 
+	for i,e := range bytesToFlatten {
+		if (i == len(bytesToFlatten)-1){
+			flatBytes = append(flatBytes, e[0:len(bytesToFlatten[i])-paddingSize]...)
+			break
+		}
+		flatBytes = append(flatBytes, e...)
+
 	}
 
-	return decryptedBytesFlat
+	return
 }

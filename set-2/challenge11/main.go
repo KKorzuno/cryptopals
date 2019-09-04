@@ -4,11 +4,11 @@ import (
 	//"crypto/aes"
 	// "encoding/base64"
 	"fmt"
-	"log"
-	"os"
+	//"log"
+	//"os"
 	// "encoding/hex"
 	// "encoding/base64"
-	"io/ioutil"
+	//"io/ioutil"
 	// "cryptopals/set-1/challenge2"
 	"cryptopals/set-2/challenge10"
 	"cryptopals/set-1/challenge8"
@@ -20,17 +20,15 @@ import (
 
 func main(){
 	
-	file, err := os.Open("song_short.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
 
-	// bytesFromFile, err := ioutil.ReadAll(file)
-	input, err := ioutil.ReadAll(file)
-
-	fmt.Println(challenge8.GetNormalizedDistanceofKeysize(encryptionOracle(input),16,5))
-
+	//fmt.Println(len(input))
+	//cyphertext := encryptionOracle(input)
+	//fmt.Println(len(cyphertext))
+	if(0 == challenge8.GetMinDistanceInKeysizeMultiComparison(encryptionOracle([]byte("YELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINE")),16,5)){
+		fmt.Println("Encrypted with ECB")
+	} else {
+	fmt.Println("Encrypted with CBC")
+	}	
 	// fmt.Println(encryptionOracle(input))
 	// fmt.Println("***********************")
 
@@ -56,12 +54,17 @@ func encryptionOracle(input []byte) (encryptedByte []byte){
 	}
 	//fmt.Println(input)
 	//fmt.Println("_________________")
+	//fmt.Println("len before appending with random bytes: ", len(input))
 	input = appendRandomBytesInFrontAndBack(input)
 	//fmt.Println(input)
 
+	//fmt.Println("len after appending with random bytes: ", len(input))
+
+
+
 	if int(flagInt.Int64()) == 0 {
 		fmt.Println("encrypting with CBC")
-		encryptedByte = challenge10.EncryptCBC("abcdefghijklmnop",string(GetRandomBytes(16)),input)
+		encryptedByte = challenge10.EncryptCBC(string(GetRandomBytes(16)),string(GetRandomBytes(16)),input)
 	} else {
 		fmt.Println("encrypting with EBC")
 		encryptedByte = challenge10.EncryptEBC(string(GetRandomBytes(16)),input)

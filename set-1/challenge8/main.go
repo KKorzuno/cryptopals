@@ -32,7 +32,7 @@ func main() {
 		input := scanner.Text()
 		tempBytes, _ := base64.StdEncoding.DecodeString(input)
 		//distances = append(distances, getNormalizedDistanceofKeysize(tempBytes, keysize, 5))
-		fmt.Println(getMinDistanceInKeysizeMultiComparison(tempBytes, keysize, 15), float64(iteration))
+		fmt.Println(GetMinDistanceInKeysizeMultiComparison(tempBytes, keysize, 15), float64(iteration))
 		iteration++
 	}
 }
@@ -50,17 +50,14 @@ func GetNormalizedDistanceofKeysize(decodedBytesFromFile []byte, keysize int, nS
 	return float64(distance) / float64(keysize) / 12
 }
 
-func getMinDistanceInKeysizeMultiComparison(decodedBytesFromFile []byte, keysize int, nSlices int) float64 {
+func GetMinDistanceInKeysizeMultiComparison(decodedBytesFromFile []byte, keysize int, nSlices int) float64 {
 
 	slices := make([][]uint8, nSlices)       // initialize a slice of dy slices
 	for i:=0;i<nSlices;i++ {
 		slices[i] = decodedBytesFromFile[i*keysize : keysize*(i+1)]
 	}
 
-
-	distance := minOfDistances(slices,16)
-
-	return float64(distance) / float64(keysize) / 12
+	return float64(MinOfDistances(slices,1000))
 }
 
 func ComputeHammingDistance(str1 string, str2 string) (result int) {
@@ -86,7 +83,7 @@ func sumOfDistances(slice [][]byte, currentSum int) (sum int) {
 	return sumOfDistances(sliceTail, currentSum)
 }
 
-func minOfDistances(slice [][]byte, currentMin int) (sum int) {
+func MinOfDistances(slice [][]byte, currentMin int) (sum int) {
 	if len(slice) < 2 {return currentMin}
 	sliceTail := slice[1:len(slice)]
 
@@ -97,7 +94,7 @@ func minOfDistances(slice [][]byte, currentMin int) (sum int) {
 			} 
 		}
 	
-	return minOfDistances(sliceTail, currentMin)
+	return MinOfDistances(sliceTail, currentMin)
 }
 
 func sumOfDistances2(slices [][]byte) (distance int){
