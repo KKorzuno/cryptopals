@@ -26,11 +26,11 @@ func main() {
 	systemToFool(secretKey, encryptedBytes)
 	PrintSliceNicely(encryptedBytes, len(secretKey))
 	estimatedKeyLength, neededPadding, doubleBytePosition := DiscoverBlocksize()
-	fmt.Println(estimatedKeyLength, neededPadding, doubleBytePosition)
+	fmt.Printf("Estimated key lenght: %v, Needed Padding: %v, Double byte found on position (counting from 0): %v\n",estimatedKeyLength, neededPadding, doubleBytePosition)
 	modifiedEncryptedBytes := nastyAttacker(encryptedBytes, estimatedKeyLength, neededPadding, doubleBytePosition)
 	PrintSliceNicely(modifiedEncryptedBytes, len(secretKey))
 	//systemToFool(secretKey, modifiedEncryptedBytes)
-
+	systemToFool(secretKey, modifiedEncryptedBytes)
 }
 
 func profileFor(email string) (encodedLogin string) {
@@ -51,6 +51,7 @@ func escapeInput(stringToParse string) (escapedString string) {
 }
 
 func loginCredsParser(concatenatedCreds string) (receivedLoginCreds loginCreds) {
+	fmt.Println(concatenatedCreds)
 	credParts := strings.Split(concatenatedCreds, "&")
 	if len(credParts) < 3 {
 		fmt.Println("wrong input for parser")
@@ -77,9 +78,16 @@ func nastyAttacker(encryptedBytes []byte, estimatedKeyLength int, neededPadding 
 	adminPadded := "admin" + strings.Repeat("\x04",estimatedKeyLength-len("admin"))
 	hostileAdminProfileEmail := strings.Repeat("A", neededPadding) + adminPadded
 	fmt.Println(hostileAdminProfileEmail)
-	tempBytes := encrypter(hostileAdminProfileEmail)
-	//fmt.Println(tempByte)
-	modifiedEncryptedBytes = tempBytes
+	tempBytesIn2D := sliceBytesInto2D(encrypter(hostileAdminProfileEmail),estimatedKeyLength)
+	
+	//18+email%estimatedKeyLength=0  -- 14 bytes long mod 16 
+	emailForPadding:="qwe@gmail.com"
+	//modifiedEncryptedBytes
+	bytesToSwapRole:= encrypter(emailForPadding)
+	bytesToSwapRoleIn2D := sliceBytesInto2D(bytesToSwapRole, estimatedKeyLength)
+	bytesToSwapRoleIn2D[2]=tempBytesIn2D[doubleBytePosition]
+	PrintSliceNicely(bytesToSwapRole, estimatedKeyLength)
+	modifiedEncryptedBytes=challenge10.FlattenPadded2DArray(bytesToSwapRoleIn2D)
 	return
 }
 
@@ -142,11 +150,16 @@ func DiscoverBlocksize() (estimatedKeyLength int, addedPseudoPadding int, double
 }
 
 func PrintSliceNicely (inputByte []byte, lenghtOfaRow int) (){
-	slicesofEncrypted := make([][]uint8, len(inputByte)/lenghtOfaRow)       
-	for i:=0;i<len(inputByte)/lenghtOfaRow;i++ {
-		slicesofEncrypted[i] = inputByte[i*lenghtOfaRow : lenghtOfaRow*(i+1)]
-	}
-	for _,v := range slicesofEncrypted { 
+	slicesToPrint := sliceBytesInto2D(inputByte, lenghtOfaRow)
+	for _,v := range slicesToPrint { 
 		fmt.Println(v)
 	}
+}
+
+func sliceBytesInto2D (inputByte []byte, lenghtOfaRow int) (slicesIn2D [][]byte){
+	slicesIn2D= make([][]byte, len(inputByte)/lenghtOfaRow)       
+	for i:=0;i<len(inputByte)/lenghtOfaRow;i++ {
+		slicesIn2D[i] = inputByte[i*lenghtOfaRow : lenghtOfaRow*(i+1)]
+	}
+	return
 }
