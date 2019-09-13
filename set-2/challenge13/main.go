@@ -24,11 +24,11 @@ func main() {
 	encryptedBytes := encrypter("krzysztof@masterofdistaster.com")
 
 	systemToFool(secretKey, encryptedBytes)
-	fmt.Println("ABCD")
-	estimatedKeyLength := DiscoverBlocksize()
-	fmt.Println(estimatedKeyLength)
-	//modifiedEncryptedBytes := nastyAttacker(encryptedBytes)
-
+	PrintSliceNicely(encryptedBytes, len(secretKey))
+	estimatedKeyLength, neededPadding, doubleBytePosition := DiscoverBlocksize()
+	fmt.Println(estimatedKeyLength, neededPadding, doubleBytePosition)
+	modifiedEncryptedBytes := nastyAttacker(encryptedBytes, estimatedKeyLength, neededPadding, doubleBytePosition)
+	PrintSliceNicely(modifiedEncryptedBytes, len(secretKey))
 	//systemToFool(secretKey, modifiedEncryptedBytes)
 
 }
@@ -73,47 +73,80 @@ func systemToFool(secretKey string, encryptedBytes []byte) {
 	fmt.Println(receviedProfile)
 }
 
-func nastyAttacker(encryptedBytes []byte) (modifiedencryptedBytes []byte) {
-	//challenge8.
+func nastyAttacker(encryptedBytes []byte, estimatedKeyLength int, neededPadding int, doubleBytePosition int) (modifiedEncryptedBytes []byte) {
+	adminPadded := "admin" + strings.Repeat("\x04",estimatedKeyLength-len("admin"))
+	hostileAdminProfileEmail := strings.Repeat("A", neededPadding) + adminPadded
+	fmt.Println(hostileAdminProfileEmail)
+	tempBytes := encrypter(hostileAdminProfileEmail)
+	//fmt.Println(tempByte)
+	modifiedEncryptedBytes = tempBytes
 	return
 }
 
 func encrypter(email string) []byte {
 
 	newProfile := profileFor(email)
+	fmt.Println(newProfile)
 	return challenge10.EncryptEBC(secretKey, []byte(newProfile))
 }
 
-func DiscoverBlocksize() (guessedBlockSize int) {
-	listOfAs := "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-	for i := 0; i < 15; i++ {
-		listOfAs = strings.Repeat("A", 16*2)
-		fmt.Println("IN DISCOVER BLOCK SIZE")
-		minDistance := challenge8.GetMinDistanceInKeysizeMultiComparison(encrypter(listOfAs), 16, 2)
+func DiscoverBlocksize() (estimatedKeyLength int, addedPseudoPadding int, doubleBytePosition int) {
+	listOfAs := strings.Repeat("A", 16*2)
+	estimatedKeyLength = 16
+	for addedPseudoPadding = 0; addedPseudoPadding < 16; addedPseudoPadding++ {
+		
+		encryptedProfileWithAs := encrypter(listOfAs)
+		// slicesofEncrypted := make([][]uint8, len(encryptedProfileWithAs)/estimatedKeyLength)       
+		// for i:=0;i<len(encryptedProfileWithAs)/estimatedKeyLength;i++ {
+		// 	slicesofEncrypted[i] = encryptedProfileWithAs[i*estimatedKeyLength : estimatedKeyLength*(i+1)]
+		// }
+		// for _,v := range slicesofEncrypted { 
+		// 	fmt.Println(v)
+		// }
+
+		minDistance := -1
+		minDistance, doubleBytePosition = challenge8.GetMinDistanceInKeysizeMultiComparison(encryptedProfileWithAs, estimatedKeyLength, len(encryptedProfileWithAs)/estimatedKeyLength )
 
 		if minDistance == 0 {
-			guessedBlockSize = 16
+			estimatedKeyLength = 16
 			return
+			
 		}
-	}
-	fmt.Println("AFTER 16 BYTE CHECK")
-	listOfAsForKeySize24 := strings.Repeat("A", 24*3)
-	for i := 0; i < 23; i++ {
 		listOfAs = listOfAs + "A"
-		if challenge8.CheckIfMinDistanceIsEqual3Times(encrypter(listOfAsForKeySize24), 24) {
-			guessedBlockSize = 24
-			return
-		}
 	}
 
-	fmt.Println("AFTER 24 BYTE CHECK")
-	listOfAsForKeySize32 := strings.Repeat("A", 32*3)
-	for i := 0; i < 31; i++ {
+	//UNTESTED CODE FOR BOTH 24 and 32 CASES
+	estimatedKeyLength = 24
+	fmt.Println("AFTER 16 BYTE CHECK")
+	listOfAs = strings.Repeat("A", 24*3)
+	for addedPseudoPadding = 0; addedPseudoPadding < 24; addedPseudoPadding++ {
 		listOfAs = listOfAs + "A"
-		if challenge8.CheckIfMinDistanceIsEqual3Times(encrypter(listOfAsForKeySize32), 32) {
-			return 32
+		encryptedProfileWithAs := encrypter(listOfAs)
+		if challenge8.CheckIfMinDistanceIsEqual3Times(encryptedProfileWithAs, estimatedKeyLength) {
+			estimatedKeyLength = 24
+			return
+		}
+	}
+	estimatedKeyLength = 32
+	fmt.Println("AFTER 24 BYTE CHECK")
+	listOfAs = strings.Repeat("A", 32*3)
+	for addedPseudoPadding = 0; addedPseudoPadding < 32; addedPseudoPadding++ {
+		listOfAs = listOfAs + "A"
+		encryptedProfileWithAs := encrypter(listOfAs)
+		if challenge8.CheckIfMinDistanceIsEqual3Times(encryptedProfileWithAs, estimatedKeyLength) {
+			return 
 		}
 	}
 	fmt.Println("AFTER 32 BYTE CHECK")
-	return -1
+	return -1, 0, -1
+}
+
+func PrintSliceNicely (inputByte []byte, lenghtOfaRow int) (){
+	slicesofEncrypted := make([][]uint8, len(inputByte)/lenghtOfaRow)       
+	for i:=0;i<len(inputByte)/lenghtOfaRow;i++ {
+		slicesofEncrypted[i] = inputByte[i*lenghtOfaRow : lenghtOfaRow*(i+1)]
+	}
+	for _,v := range slicesofEncrypted { 
+		fmt.Println(v)
+	}
 }
