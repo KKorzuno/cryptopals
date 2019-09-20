@@ -11,30 +11,30 @@ import (
 	//"io/ioutil"
 	// "cryptopals/set-1/challenge2"
 	"cryptopals/set-2/challenge10"
-	"cryptopals/set-1/challenge8"
+	// "cryptopals/set-1/challenge8"
 	"crypto/rand"
 	"math/big"
 )
 
 
 
-func main(){
+// func main(){
 	
 
-	//fmt.Println(len(input))
-	//cyphertext := encryptionOracle(input)
-	//fmt.Println(len(cyphertext))
-	if(0 == challenge8.GetMinDistanceInKeysizeMultiComparison(encryptionOracle([]byte("YELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINE")),16,5)){
-		fmt.Println("Encrypted with ECB")
-	} else {
-	fmt.Println("Encrypted with CBC")
-	}	
-	// fmt.Println(encryptionOracle(input))
-	// fmt.Println("***********************")
+// 	//fmt.Println(len(input))
+// 	//cyphertext := encryptionOracle(input)
+// 	//fmt.Println(len(cyphertext))
+// 	if(0 == challenge8.GetMinDistanceInKeysizeMultiComparison(encryptionOracle([]byte("YELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINEYELLOW SUBMARINE")),16,5)){
+// 		fmt.Println("Encrypted with ECB")
+// 	} else {
+// 	fmt.Println("Encrypted with CBC")
+// 	}	
+// 	// fmt.Println(encryptionOracle(input))
+// 	// fmt.Println("***********************")
 
 	
 
-}
+// }
 
 func GetRandomBytes(numberOfBytes int)(randomBytes []byte){
 
