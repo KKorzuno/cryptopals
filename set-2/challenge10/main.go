@@ -65,8 +65,8 @@ func EncryptEBC(key string, bytesToEncrypt []byte) []byte{
 	for _,e := range encryptedBytesIn2D {
 		encryptedBytesFlat = append(encryptedBytesFlat, e...)
 	}
-
 	return encryptedBytesFlat
+	
 }
 
 func DecryptEBC(key string, bytesToDecrypt []byte) []byte{

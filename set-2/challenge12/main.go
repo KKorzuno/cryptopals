@@ -1,4 +1,4 @@
-package main
+package challenge12
 
 import (
 	"cryptopals/set-2/challenge10"
@@ -16,7 +16,7 @@ func main() {
 	unknownString, _ := base64.StdEncoding.DecodeString(unknownStringbase64)
 	unknownKey := "YELLOW SUBMARINE"
 
-	keysize := discoverBlocksize(unknownString, unknownKey)
+	keysize := DiscoverBlocksize(unknownString, unknownKey)
 
 	//Initialization for the first iteration, generating a keysize long list of A's
 	decryptedPaddedByte := getOneByteShortLetterList(keysize + 1)
@@ -55,14 +55,21 @@ func encryptionOracle(input []byte, unknownString []byte, unknownKey string) (en
 	return
 }
 
-func discoverBlocksize(unknownString []byte, unknownKey string) (blockSize int) {
-	listOfAs := ""
-	for i := 1; i < 64; i++ {
-		listOfAs = listOfAs + "AA"
+func DiscoverBlocksize(unknownString []byte, unknownKey string) (blockSize int) {
+	listOfAs := "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+	for i := 1; i < 15; i++ {
+		listOfAs = listOfAs + "A"
 		minDistance := challenge8.GetMinDistanceInKeysizeMultiComparison(encryptionOracle([]byte(listOfAs), unknownString, unknownKey), i, 2)
 
 		if minDistance == 0 {
 			return i
+		} else {
+			listOfAs := "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+			for i := 1; i < 15; i++ {
+				listOfAs = listOfAs + "A"
+				//minDistance := challenge8.GetMinDistanceInKeysizeMultiComparison(encryptionOracle([]byte(listOfAs), unknownString, unknownKey), i, 3)
+
+			}
 		}
 	}
 	return 0
