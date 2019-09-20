@@ -4,7 +4,7 @@ import (
 
 	"cryptopals/set-1/challenge2"
 
-	"encoding/base64"
+	//"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"log"
@@ -23,16 +23,16 @@ func main() {
 	}
 	defer file.Close()
 
-	keysize:=16
+	//keysize:=16
 
 	scanner := bufio.NewScanner(file)
 	//var distances []float64
 	var iteration int
 	for scanner.Scan() {
-		input := scanner.Text()
-		tempBytes, _ := base64.StdEncoding.DecodeString(input)
+		//input := scanner.Text()
+		//tempBytes, _ := base64.StdEncoding.DecodeString(input)
 		//distances = append(distances, getNormalizedDistanceofKeysize(tempBytes, keysize, 5))
-		fmt.Println(GetMinDistanceInKeysizeMultiComparison(tempBytes, keysize, 15), float64(iteration))
+		//fmt.Println(GetMinDistanceInKeysizeMultiComparison(tempBytes, keysize, 15), iteration)
 		iteration++
 	}
 }
@@ -50,14 +50,16 @@ func GetNormalizedDistanceofKeysize(decodedBytesFromFile []byte, keysize int, nS
 	return float64(distance) / float64(keysize) / 12
 }
 
-func GetMinDistanceInKeysizeMultiComparison(decodedBytesFromFile []byte, keysize int, nSlices int) float64 {
+func GetMinDistanceInKeysizeMultiComparison(decodedBytesFromFile []byte, keysize int, nSlices int) (minDistanceFound int, positionofDoubleByte int) {
 
 	slices := make([][]uint8, nSlices)       // initialize a slice of dy slices
 	for i:=0;i<nSlices;i++ {
 		slices[i] = decodedBytesFromFile[i*keysize : keysize*(i+1)]
 	}
-
-	return float64(MinOfDistances(slices,1000))
+	//fmt.Println(slices)
+	outsideValueForDoubleBytesPosition:=0
+	return MinOfDistances(slices,1000, 0, &outsideValueForDoubleBytesPosition), outsideValueForDoubleBytesPosition
+	
 }
 
 func ComputeHammingDistance(str1 string, str2 string) (result int) {
@@ -83,18 +85,21 @@ func sumOfDistances(slice [][]byte, currentSum int) (sum int) {
 	return sumOfDistances(sliceTail, currentSum)
 }
 
-func MinOfDistances(slice [][]byte, currentMin int) (sum int) {
+func MinOfDistances(slice [][]byte, currentMin int, tempSliceNumber int, outsideValueForDoubleBytesPosition *int) (sum int) {
 	if len(slice) < 2 {return currentMin}
 	sliceTail := slice[1:len(slice)]
-
 		for _,e := range sliceTail {
 			temp := ComputeHammingDistance(hex.EncodeToString(slice[0]), hex.EncodeToString(e))
 			if currentMin > temp {
 				currentMin = temp
+				if temp==0 {
+					*outsideValueForDoubleBytesPosition = tempSliceNumber
+					fmt.Println("IM IN DOUBLE BYTE ASSIGNMENT")
+				}
 			} 
 		}
-	
-	return MinOfDistances(sliceTail, currentMin)
+		tempSliceNumber++
+	return MinOfDistances(sliceTail, currentMin, tempSliceNumber, outsideValueForDoubleBytesPosition)
 }
 
 func sumOfDistances2(slices [][]byte) (distance int){
@@ -160,3 +165,30 @@ func englishCount(input string) (count int) {
 	}
 	return
 }
+
+
+func CheckIfMinDistanceIsEqual3Times(decodedBytesFromFile []byte, keysize int) bool {
+
+	slices := make([][]uint8, len(decodedBytesFromFile)/keysize)       
+	for i:=0;i<len(decodedBytesFromFile)/keysize;i++ {
+		slices[i] = decodedBytesFromFile[i*keysize : keysize*(i+1)]
+	}
+
+	return FindThreeEqualDistances(slices)
+}
+
+func FindThreeEqualDistances(slice [][]byte) (ThreeEqual bool) {
+	if len(slice) < 3 {return false}
+	sliceTail := slice[1:len(slice)]
+	ThreeEqual = false
+	FoundEqualDistanceOnce := false
+		for _,e := range sliceTail {
+			temp := ComputeHammingDistance(hex.EncodeToString(slice[0]), hex.EncodeToString(e))
+			if temp == 0 &&	FoundEqualDistanceOnce == true {
+				 return true
+			} else if temp == 0 {
+				FoundEqualDistanceOnce = true
+			}
+		}
+		return FindThreeEqualDistances(sliceTail)
+	}
