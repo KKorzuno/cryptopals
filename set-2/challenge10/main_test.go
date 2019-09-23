@@ -1,4 +1,4 @@
-package challenge10
+package main
 
 
 import "testing"

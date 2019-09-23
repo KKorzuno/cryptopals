@@ -10,14 +10,7 @@ import (
 	"os"
 )
 
-func englishCount(input string) (count int) {
-	input = strings.ToLower(input)
-	for _ , element := range "etaoin shrdlu" {
-		count += strings.Count(input, string(element))
-	}
-	//fmt.Println(input)
-	return
-}
+
 
 func main() {
 	file, err := os.Open("4.txt")

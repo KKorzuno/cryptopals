@@ -17,9 +17,6 @@ func main() {
 	//unknownByte = unknownByte[0:1]
 	unknownKey := "YELLOW SUBMARINE"
 
-	fmt.Println(string(unknownByte))
-	fmt.Println(len(string(unknownByte)))
-
 	sillyOracle:= supportfunctions.NewPrefixInputPostfixECBOracle("", string(unknownByte),unknownKey)
 	decyphered:= supportfunctions.PaddingOracleAttack(sillyOracle)
 

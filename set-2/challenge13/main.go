@@ -1,9 +1,9 @@
 package main
 
 import (
-	"cryptopals/set-2/challenge10"
+	"cryptopals/supportfunctions"
+
 	//"encoding/base64"
-	"cryptopals/set-1/challenge8"
 	"fmt"
 	//"cryptopals/set-2/challenge12"
 	"strconv"
@@ -25,7 +25,7 @@ func main() {
 
 	systemToFool(secretKey, encryptedBytes)
 	PrintSliceNicely(encryptedBytes, len(secretKey))
-	estimatedKeyLength, neededPadding, doubleBytePosition := DiscoverBlocksize()
+	estimatedKeyLength, neededPadding, doubleBytePosition := supportfunctions.DiscoverBlocksize()
 	fmt.Printf("Estimated key lenght: %v, Needed Padding: %v, Double byte found on position (counting from 0): %v\n",estimatedKeyLength, neededPadding, doubleBytePosition)
 	modifiedEncryptedBytes := nastyAttacker(encryptedBytes, estimatedKeyLength, neededPadding, doubleBytePosition)
 	PrintSliceNicely(modifiedEncryptedBytes, len(secretKey))
@@ -68,7 +68,8 @@ func loginCredsParser(concatenatedCreds string) (receivedLoginCreds loginCreds) 
 }
 
 func systemToFool(secretKey string, encryptedBytes []byte) {
-	decryptedBytes := challenge10.DecryptEBC(secretKey, encryptedBytes)
+	//decryptedBytes := challenge10.DecryptEBC(secretKey, encryptedBytes)
+	decryptedBytes := supportfunctions.Decrypt(secretKey, encryptedBytes)
 	receviedProfile := loginCredsParser(string(decryptedBytes))
 	fmt.Println("Im the system that does not want to be fooled and I received the following profile:")
 	fmt.Println(receviedProfile)
@@ -78,7 +79,7 @@ func nastyAttacker(encryptedBytes []byte, estimatedKeyLength int, neededPadding 
 	adminPadded := "admin" + strings.Repeat("\x04",estimatedKeyLength-len("admin"))
 	hostileAdminProfileEmail := strings.Repeat("A", neededPadding) + adminPadded
 	fmt.Println(hostileAdminProfileEmail)
-	tempBytesIn2D := sliceBytesInto2D(encrypter(hostileAdminProfileEmail),estimatedKeyLength)
+	tempBytesIn2D := supportfunctions.SliceBytesInto2D(encrypter(hostileAdminProfileEmail),estimatedKeyLength)
 	
 	//18+email%estimatedKeyLength=0  -- 14 bytes long mod 16 
 	emailForPadding:="qwe@gmail.com"
@@ -99,61 +100,10 @@ func encrypter(email string) []byte {
 }
 
 
-
+//PrintSliceNicely Transforms the slice into a 2D slice of lenght lenghtOfaRow, then prints it nicely
 func PrintSliceNicely (inputByte []byte, lenghtOfaRow int) (){
 	slicesToPrint := sliceBytesInto2D(inputByte, lenghtOfaRow)
 	for _,v := range slicesToPrint { 
 		fmt.Println(v)
 	}
-}
-
-func DiscoverBlocksize() (estimatedKeyLength int, addedPseudoPadding int, doubleBytePosition int) {
-	listOfAs := strings.Repeat("A", 16*2)
-	estimatedKeyLength = 16
-	for addedPseudoPadding = 0; addedPseudoPadding < 16; addedPseudoPadding++ {
-		
-		encryptedProfileWithAs := encrypter(listOfAs)
-		// slicesofEncrypted := make([][]uint8, len(encryptedProfileWithAs)/estimatedKeyLength)       
-		// for i:=0;i<len(encryptedProfileWithAs)/estimatedKeyLength;i++ {
-		// 	slicesofEncrypted[i] = encryptedProfileWithAs[i*estimatedKeyLength : estimatedKeyLength*(i+1)]
-		// }
-		// for _,v := range slicesofEncrypted { 
-		// 	fmt.Println(v)
-		// }
-
-		minDistance := -1
-		minDistance, doubleBytePosition = challenge8.GetMinDistanceInKeysizeMultiComparison(encryptedProfileWithAs, estimatedKeyLength, len(encryptedProfileWithAs)/estimatedKeyLength )
-
-		if minDistance == 0 {
-			estimatedKeyLength = 16
-			return
-			
-		}
-		listOfAs = listOfAs + "A"
-	}
-
-	//UNTESTED CODE FOR BOTH 24 and 32 CASES
-	estimatedKeyLength = 24
-	fmt.Println("AFTER 16 BYTE CHECK")
-	listOfAs = strings.Repeat("A", 24*3)
-	for addedPseudoPadding = 0; addedPseudoPadding < 24; addedPseudoPadding++ {
-		listOfAs = listOfAs + "A"
-		encryptedProfileWithAs := encrypter(listOfAs)
-		if challenge8.CheckIfMinDistanceIsEqual3Times(encryptedProfileWithAs, estimatedKeyLength) {
-			estimatedKeyLength = 24
-			return
-		}
-	}
-	estimatedKeyLength = 32
-	fmt.Println("AFTER 24 BYTE CHECK")
-	listOfAs = strings.Repeat("A", 32*3)
-	for addedPseudoPadding = 0; addedPseudoPadding < 32; addedPseudoPadding++ {
-		listOfAs = listOfAs + "A"
-		encryptedProfileWithAs := encrypter(listOfAs)
-		if challenge8.CheckIfMinDistanceIsEqual3Times(encryptedProfileWithAs, estimatedKeyLength) {
-			return 
-		}
-	}
-	fmt.Println("AFTER 32 BYTE CHECK")
-	return -1, 0, -1
 }

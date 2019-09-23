@@ -1,25 +1,20 @@
 package main
 
 import (
-	"encoding/base64"
-	"encoding/hex"
+	"cryptopals/supportfunctions"
 	"fmt"
+	"log"
 )
 
-func Hex_string_to_base64(msg string) (output string, err error) {
-	decoded_hex_string, err := hex.DecodeString(msg)
-	output = base64.StdEncoding.EncodeToString(decoded_hex_string)
-	//fmt.Println(output)
-	return
-}
+
 
 func main(){
 	mymsg := "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"
-	base64_str, myerr := Hex_string_to_base64(mymsg)
+	base64str, myerr := supportfunctions.HexStringToBase64(mymsg)
 	if myerr != nil {
-		fmt.Println("error:", myerr)
+		log.Fatal("problems when encoding from hex to base64")
 		return
 	}
-	fmt.Println(base64_str)
+	fmt.Println(base64str)
 	return
 }

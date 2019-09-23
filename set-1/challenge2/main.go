@@ -1,57 +1,20 @@
-package challenge2
+package main
 
 import (
-	"encoding/base64"
-	"encoding/hex"
+
 	"fmt"
-	"errors"
+	"cryptopals/supportfunctions"
+	"encoding/hex"
+	"log"
 )
 
-func Hex_string_to_base64(msg string) (output string, err error) {
-	decoded_hex_string, err := hex.DecodeString(msg)
-	output = base64.StdEncoding.EncodeToString(decoded_hex_string)
-	//fmt.Println(output)
-	return
-}
-
-func Fixed_XOR_on_hex_strings(hex_string, hex_string2 string) (output_hex_string string, err error) {
-	decoded_hex_string, err := hex.DecodeString(hex_string)
-	if err != nil{
-		fmt.Println(err)
-	}
-	decoded_hex_string2, err := hex.DecodeString(hex_string2)
-
-	//fmt.Printf("type: %T", decoded_hex_string)
-	//base64_str, myerr := Hex_string_to_base64(mymsg)
-	if err != nil{
-		fmt.Println(err)
-	}
-	// fmt.Println(len(decoded_hex_string) , len(decoded_hex_string2))
-
-	if len(decoded_hex_string) != len(decoded_hex_string2) {
-		err = errors.New("Hex strings are not of equal lenght")		
-		return
-	}
-	if err != nil {
-		fmt.Println("error")
-		return
-	}
-	//fmt.Printf("\n%v %v", decoded_hex_string, decoded_hex_string2)
-	output:=make([]byte,len(decoded_hex_string))
-	for i:=0; i<len(decoded_hex_string); i++ {
-		output[i] = decoded_hex_string[i]^decoded_hex_string2[i]
-	}
-	//fmt.Printf("\n\n\nOUTPUT: %v\n", output)
-	output_hex_string = hex.EncodeToString(output)	
-	//fmt.Println(encoded_hex)
-	return
-}
-
 func main(){
-	xor_output,myerr := Fixed_XOR_on_hex_strings("1c0111001f010100061a024b53535009181c", "686974207468652062756c6c277320657965")
-	if myerr != nil {
-		fmt.Println("error")
-		return
-	}
-	fmt.Println(xor_output)
+	hex1:= "1c0111001f010100061a024b53535009181c"
+	hex2:= "686974207468652062756c6c277320657965"
+	byte1, err1 := supportfunctions.HexStringToBytes(hex1)
+	byte2, err2 := supportfunctions.HexStringToBytes(hex2)
+	if err1!=nil {log.Fatal(err1)}
+	if err2!=nil {log.Fatal(err2)}
+	xorOutput := supportfunctions.XOROnBytes(byte1, byte2)
+	fmt.Println(hex.EncodeToString(xorOutput))
 }
