@@ -98,6 +98,15 @@ func encrypter(email string) []byte {
 	return challenge10.EncryptEBC(secretKey, []byte(newProfile))
 }
 
+
+
+func PrintSliceNicely (inputByte []byte, lenghtOfaRow int) (){
+	slicesToPrint := sliceBytesInto2D(inputByte, lenghtOfaRow)
+	for _,v := range slicesToPrint { 
+		fmt.Println(v)
+	}
+}
+
 func DiscoverBlocksize() (estimatedKeyLength int, addedPseudoPadding int, doubleBytePosition int) {
 	listOfAs := strings.Repeat("A", 16*2)
 	estimatedKeyLength = 16
@@ -147,19 +156,4 @@ func DiscoverBlocksize() (estimatedKeyLength int, addedPseudoPadding int, double
 	}
 	fmt.Println("AFTER 32 BYTE CHECK")
 	return -1, 0, -1
-}
-
-func PrintSliceNicely (inputByte []byte, lenghtOfaRow int) (){
-	slicesToPrint := sliceBytesInto2D(inputByte, lenghtOfaRow)
-	for _,v := range slicesToPrint { 
-		fmt.Println(v)
-	}
-}
-
-func sliceBytesInto2D (inputByte []byte, lenghtOfaRow int) (slicesIn2D [][]byte){
-	slicesIn2D= make([][]byte, len(inputByte)/lenghtOfaRow)       
-	for i:=0;i<len(inputByte)/lenghtOfaRow;i++ {
-		slicesIn2D[i] = inputByte[i*lenghtOfaRow : lenghtOfaRow*(i+1)]
-	}
-	return
 }

@@ -89,9 +89,11 @@ func MinOfDistances(slice [][]byte, currentMin int, tempSliceNumber int, outside
 	if len(slice) < 2 {return currentMin}
 	sliceTail := slice[1:len(slice)]
 		for _,e := range sliceTail {
+			fmt.Printf("Current minimum : %v\n",currentMin)
 			temp := ComputeHammingDistance(hex.EncodeToString(slice[0]), hex.EncodeToString(e))
 			if currentMin > temp {
 				currentMin = temp
+				fmt.Printf("CURRENTMIN > TEMP, Current minimum : %v and current temp: %v\n",currentMin,temp)
 				if temp==0 {
 					*outsideValueForDoubleBytesPosition = tempSliceNumber
 					fmt.Println("IM IN DOUBLE BYTE ASSIGNMENT")
