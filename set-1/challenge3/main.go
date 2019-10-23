@@ -22,7 +22,6 @@ func main() {
 	for letter := 0; letter < 128 ; letter++ {
 		texts[letter]=string(supportfunctions.GetByteListFromClonedString(rowLength, string(letter)))
 		msg := supportfunctions.XOROnBytes([]byte(byteInput), []byte(texts[letter]))
-		fmt.Println(string(msg))
 		decodedString[letter] = string(msg)
 	}
 
