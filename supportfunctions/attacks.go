@@ -12,7 +12,7 @@ func PaddingOracleAttack (attackedOracle Oracle)(string){
 	keysize, _, _ := DiscoverBlockSize(attackedOracle)
 	fmt.Println(keysize)
 	//Initialization for the first iteration, generating a keysize long list of A's to measure total number of bytes
-	decryptedLetterPlusPadding := GetCloneByteList(keysize)
+	decryptedLetterPlusPadding := GetByteListFromClonedString(keysize, "A")
 	//Passing empty just to see how long the output is, to calculate the number of iterations to scan through all
 	encryptedBytes := attackedOracle.Encrypt([]byte(""))
 	
@@ -23,7 +23,7 @@ func PaddingOracleAttack (attackedOracle Oracle)(string){
 	
 		for i := 0; i < keysize; i++ {
 			
-			attackerString := GetCloneByteList(keysize -1 - i)
+			attackerString := GetByteListFromClonedString(keysize -1 - i,"A")
 			//fmt.Println("attackerString", attackerString)
 			encryptedBytes := attackedOracle.Encrypt([]byte(attackerString))
 			keysizeOfBytes := encryptedBytes[keysize*j:keysize*(j+1)]

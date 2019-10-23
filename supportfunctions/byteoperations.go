@@ -53,13 +53,8 @@ func HexStringToBytes(msg string) (output []byte, err error) {
 func GetCypherMap(sillyOracle Oracle, keysize int, oneByteShortByteList []byte) (map[string]string) {
 	cyphers := make(map[string]string, 128)
 	var temporaryString string
-	//var temp82,temp83 string
 	for i := 0; i < 128; i++ {
-		//fmt.Println("oneByteShortByteList", string(oneByteShortByteList))
 		val := append(oneByteShortByteList, []byte(string(i))...)
-		//fmt.Println("LENGHT OF VAL AFTER append: ", len(val))
-		//fmt.Println([]byte(val))
-		//key := string(sillyOracle.Encrypt([]byte(val)))
 		temp := sillyOracle.Encrypt([]byte(val))
 		tempIn2D:= slicePaddedBytesInto2D(temp, keysize)
 		key:=tempIn2D[0]
@@ -81,15 +76,14 @@ func GetCypherMap(sillyOracle Oracle, keysize int, oneByteShortByteList []byte) 
 	return cyphers
 }
 
-//GetCloneByteList abc
-func GetCloneByteList(size int) []byte {
-	var byteBunchOfAs []byte
-	// -2 due to size given at 16, m
+//GetByteListFromClonedString abc
+func GetByteListFromClonedString(size int, letter string) []byte {
+	var byteBunchOfBytes []byte
 	for i := 0; i < size; i++ {
-		byteBunchOfAs = append(byteBunchOfAs, []byte("A")...)	
+		byteBunchOfBytes = append(byteBunchOfBytes, []byte(letter)...)	
 	}
 	//fmt.Println("LEN OF PREPARED BYTE LIST:", len(byteBunchOfAs))
-	return byteBunchOfAs
+	return byteBunchOfBytes
 }
 
 

@@ -1,13 +1,11 @@
 package main
 
 import (
-	"../challenge2"
-	"encoding/hex"
 	"fmt"
-	"strings"
 	"log"
 	"bufio"
 	"os"
+	"cryptopals/supportfunctions"
 )
 
 
@@ -24,8 +22,11 @@ func main() {
 	var bestLines []string
     for scanner.Scan() {
 		input := scanner.Text()
-		
-		bestLines = append(bestLines, createTableOfAllRepeatingKeyXORsWithInput(input))
+		inputBytes, err2 := supportfunctions.HexStringToBytes(input)
+		if err2 != nil{
+			log.Fatal(err2)
+		}
+		bestLines = append(bestLines, createTableOfAllRepeatingKeyXORsWithInput(string(inputBytes)))
     } 
 
     if err := scanner.Err(); err != nil {
@@ -36,14 +37,14 @@ func main() {
 }
 func createTableOfAllRepeatingKeyXORsWithInput(input string) (bestString string){
 	
-	texts := make([]string, 255)
-	decodedString := make([]string, 255)
+	texts := make([]string, 128)
+	decodedString := make([]string, 128)
 	// fmt.Println("balalla")
-	for letter := 0; letter < 255; letter++ {
+	for letter := 0; letter < 128; letter++ {
 
-		for i := 0; i < len(input)/len(hex.EncodeToString([]byte(string(letter)))); i++ {
+		for i := 0; i < len(input)/len(string(letter)); i++ {
 			// fmt.Printf("\nletter: %v, i:%v\n", letter, i)
-			texts[letter] += hex.EncodeToString([]byte(string(letter)))
+			texts[letter] += string(letter)
 
 		}
 		//fmt.Println(len([]byte(texts[letter])))
@@ -51,18 +52,9 @@ func createTableOfAllRepeatingKeyXORsWithInput(input string) (bestString string)
 		// fmt.Printf("contents of hex(byte):%s\n",texts[letter])
 		// fmt.Println("")
 		
-		msg, err := challenge2.Fixed_XOR_on_hex_strings(input, texts[letter])
-		if err != nil {
-			fmt.Println(input, texts[letter])
-			fmt.Println("PROBLEMS with XOR " + err.Error())
-			return
-		}
-		str2, err2 := hex.DecodeString(msg)
-		if err2 != nil {
-			fmt.Println("PROBLEMS with decoding the outcome hex")
-			return
-		}
-		decodedString[letter] = string(str2)
+		msg := supportfunctions.XOROnBytes([]byte(input), []byte(texts[letter]))
+
+		decodedString[letter] = string(msg)
 		//fmt.Println(decodedString[letter])
 	}
 
@@ -72,7 +64,7 @@ func createTableOfAllRepeatingKeyXORsWithInput(input string) (bestString string)
 func findMostEnglishString(decodedString []string) (bestString string) {
 	var maxCount int
 	for _ , element := range decodedString {
-		currentCount := englishCount(element)
+		currentCount := supportfunctions.EnglishCount(element)
 		if currentCount > maxCount {
 			bestString = element
 			maxCount = currentCount

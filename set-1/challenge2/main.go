@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"fmt"
 	"cryptopals/supportfunctions"
 	"encoding/hex"
