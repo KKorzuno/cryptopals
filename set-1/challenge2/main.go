@@ -16,4 +16,5 @@ func main(){
 	if err2!=nil {log.Fatal(err2)}
 	xorOutput := supportfunctions.XOROnBytes(byte1, byte2)
 	fmt.Println(hex.EncodeToString(xorOutput))
+	fmt.Println("746865206b696420646f6e277420706c6179")
 }

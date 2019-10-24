@@ -7,7 +7,7 @@ import (
 )
 
 //PaddingOracleAttack abc
-func PaddingOracleAttack (attackedOracle Oracle)(string){
+func PaddingOracleAttack(attackedOracle Oracle)(string){
 	
 	keysize, _, _ := DiscoverBlockSize(attackedOracle)
 	fmt.Println(keysize)
@@ -71,10 +71,30 @@ func getMostProbableKeyLetter(input string) (int,  string){
 		decodedStrings[letter] = string(msg)
 	}
 
-	return findMostEnglishString(decodedStrings)
+	return FindMostEnglishString(decodedStrings)
 }
 
-func findMostEnglishString(decodedString []string) (letter int, bestString string) {
+//CreateTableOfAllRepeatingKeyXORsWithInput Creates a table with 128 ASCII chars repeated len(input) times, then XORs it with the input.
+func CreateTableOfAllRepeatingKeyXORsWithInput(input string) ([]string){
+	
+	texts := make([]string, 128)
+	decodedString := make([]string, 128)
+	rowLength := len(input)/len(string("A"))
+	// fmt.Println("balalla")
+	for letter := 0; letter < 128; letter++ {
+
+		texts[letter]=string(GetByteListFromClonedString(rowLength, string(letter)))
+		msg := XOROnBytes([]byte(input), []byte(texts[letter]))
+
+		decodedString[letter] = string(msg)
+		//fmt.Println(decodedString[letter])
+	}
+
+	return decodedString
+}
+
+//FindMostEnglishString To find highest probability of an English text, applies a counter on letters in "etaoin shrdlu" on a set of strings, returning the one that has the most.
+func FindMostEnglishString(decodedString []string) (letter int, bestString string) {
 	var maxCount int
 	for i , element := range decodedString {
 		currentCount := EnglishCount(element)

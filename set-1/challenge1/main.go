@@ -16,5 +16,6 @@ func main(){
 		return
 	}
 	fmt.Println(base64str)
+	fmt.Println("SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t")
 	return
 }

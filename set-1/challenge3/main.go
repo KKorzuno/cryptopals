@@ -21,20 +21,10 @@ func main() {
 	rowLength := len(byteInput)/len(string("A"))
 	for letter := 0; letter < 128 ; letter++ {
 		texts[letter]=string(supportfunctions.GetByteListFromClonedString(rowLength, string(letter)))
-		msg := supportfunctions.XOROnBytes([]byte(byteInput), []byte(texts[letter]))
+		msg := supportfunctions.XOROnBytes(byteInput, []byte(texts[letter]))
 		decodedString[letter] = string(msg)
 	}
-
-	var maxCount int
-	var bestString string
-	for _ , element := range decodedString {
-		currentCount := supportfunctions.EnglishCount(element)
-		if currentCount > maxCount {
-			bestString = element
-			maxCount = currentCount
-		}
-		//fmt.Println(currentCount)
-	
-	}
+	_, bestString:= supportfunctions.FindMostEnglishString(decodedString)
 	fmt.Println(bestString)
 }
+
